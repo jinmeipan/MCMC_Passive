@@ -1,0 +1,403 @@
+! -------------------------------------------------------------------------
+!
+SUBROUTINE ABSCOEFF(EPSI,EPSII,TI,FREQ,WIFR,GAI,NUM)
+!
+! -------------------------------------------------------------------------
+!
+!   CODE ORIGINALLY OBTAINED IN MATLAB FROM MATZLER
+!
+!   COMPUTES THE ABSORPTION COEFFICIENT FROM THE DIELECTRIC PROPERTIES
+!
+!
+!   [GAI] = ABSCOEFF(EPSI,EPSII,TI,FREQ,WI)
+!       GAI:   ABSORPTION COEFFICIENT [M^-1]
+!       EPSI:  REAL PART DIEL
+!       EPSII: IMAGINARY PART DIEL
+!       TI:    PHYSICAL TEMPERATURE
+!       FREQ:  FREQUENCY [GHZ]
+!       WI:    VOLUMETRIC LIQUID WATER CONTENT
+!
+!   VERSION HISTORY:
+!      1.0    WI 15.7.95
+!      1.1    WI 12.11.97 MORE PRECISE FORMULA FOR GAI USED
+!      2.0    MD 1 APR 05 TRANSLATED TO FORTRAN FROM MATLAB
+!
+!   USES: NONE
+
+IMPLICIT NONE
+
+INTEGER, INTENT(IN) :: NUM
+REAL, INTENT(IN) :: EPSI(NUM),EPSII(NUM),TI(NUM),FREQ,WIFR(NUM)
+REAL, INTENT(OUT) :: GAI(NUM)
+REAL C,PI
+
+C=2.99793
+PI=3.14159
+GAI=((2*PI*10*FREQ)*EPSII)/(C*(EPSI-(EPSII**2/4*EPSI))**0.5)
+
+END SUBROUTINE ABSCOEFF
+
+
+
+
+
+! -------------------------------------------------------------------------
+!
+SUBROUTINE MIXMOD(FREQ,TI,WIFR,EPSI,EPSII,NUM)
+!
+! -------------------------------------------------------------------------
+!
+!     CODE ORIGINALLY OBTAINED IN MATLAB FROM MATZLER
+!
+!   CALCULATES THE PERMITTIVITY FOR WETNESS > 0
+!      PHYSICAL MIXING MODEL WEISE 97 AFTER MATZLER 1987 (CORRECTED)
+!      WATER TEMPERATURE IS ASSUMED CONSTANT AT 273.15 K
+!
+!   [EPSI,EPSII] = MIXMOD(F,TI,WI,EPSI,EPSII)
+!       EPSI:  REAL PART OF THE PERMITTIVITY
+!       EPSII: IMAGINARY PART OF THE PERMITTIVITY
+!       F:     FREQUENCY [GHZ]
+!       TI:    PHYSICAL SNOW TEMPERATURE
+!       WI:    WETNESS [!]
+!       EPSI:  REAL PART OF DRY SNOW PERM.
+!       EPSII: IMAGINARY PART OF DRY SNOW PERM.
+!
+!   VERSION HISTORY:
+!      1.0    WI 15.7.95
+!      2.0    MD  1 APR 05 TRANSLATED TO FORTRAN FROM MATLAB
+!      2.1    MD 21 NOV 05 MADE ALL LOCALS DYNAMICALLY ALLOCATABLE
+!
+!   USES: - NONE
+!
+!   COPYRIGHT (C) 1997 BY THE INSTITUTE OF APPLIED PHYSICS,
+!   UNIVERSITY OF BERN, SWITZERLAND
+
+IMPLICIT NONE
+
+INTEGER, INTENT(IN) :: NUM
+REAL, INTENT(IN) :: FREQ, TI(NUM), WIFR(NUM)
+REAL, INTENT(INOUT) :: EPSI(NUM), EPSII(NUM)
+
+REAL :: AA,AB,AC,Wi
+COMPLEX :: EW,epsd,Ka,Kb,K,epsz,epsn,eps
+COMPLEX :: i0
+INTEGER :: i
+
+AA=0.005
+AB=0.4975
+AC=0.4975
+
+i0=dcmplx(0.0,1.0)
+
+DO i=1,NUM
+    Call EPSW(FREQ,TI(i),ew)
+    epsd=EPSI(i)+EPSII(i)*i0
+    Wi=WIFR(i)
+
+    Ka=epsd/(epsd+AA*(ew-epsd))
+    Kb=epsd/(epsd+AB*(ew-epsd))
+    K =(Ka+2.0*Kb)/3.0
+    epsz=(1.0-Wi)*epsd+Wi*ew*K
+    epsn=1.0-Wi*(1.0-K)
+    eps=epsz/epsn   !Maxwell-Garnett Mixing of water in dry snow
+
+    EPSI(i)=real(eps)
+    EPSII(i)=imag(eps)
+ENDDO
+
+END SUBROUTINE MIXMOD
+
+
+
+
+
+! -------------------------------------------------------------------------
+!
+SUBROUTINE EPSW(F,T,EW)
+!
+! -------------------------------------------------------------------------
+!
+! REVISED CODE FROM MEMLS, WRITTEN BY JINMEI
+! INPUT:
+! F - Frequency,GHz
+! T - Temperature,K
+
+IMPLICIT NONE
+
+REAL,INTENT(IN) :: F,T
+COMPLEX,INTENT(OUT) :: EW
+REAL TETA,TK,e0,e1,e2,f1,f2,fGHz
+COMPLEX :: i0
+
+
+TK=T
+fGHz=F;
+
+TETA=1.0-300/TK;
+e0=77.66-103.3*TETA;
+e1=0.0671*e0;
+f1=20.2+146.4*TETA+316.0*TETA*TETA;
+e2=3.52+7.52*TETA;
+
+f2=39.8*f1;
+i0=dcmplx(0.0,1.0)
+EW=e2+(e1-e2)/(1.0-i0*fGHz/f2)+(e0-e1)/(1.0-i0*fGHz/f1);
+
+
+
+END SUBROUTINE EPSW
+
+
+
+
+
+
+! -------------------------------------------------------------------------
+!
+SUBROUTINE RO2EPSD(ROI,TI,FREQ,EPSI,EPSII,NUM)
+!
+! -------------------------------------------------------------------------
+!
+!     CODE ORIGINALLY OBTAINED IN MATLAB FROM MATZLER
+!
+!   CALCULATES THE DIELECTRIC PERMITTIVITY FROM
+!   DENSITY FOR DRY SNOW.
+!
+!   [EPSI,EPSII] = RO2EPSD(ROI,TI,FREQ)
+!       EPSI:  REAL PART OF DIELECTRIC PERMITTIVITY
+!       EPSII: IMAGINARY PART OF DIELECTRIC PERMITTIVITY
+!       ROI:   DENSITY
+!       TI:    SNOW TEMPERATURE IN KELVIN
+!       FREQ:  FREQUENCY
+!
+!   VERSION HISTORY:
+!      1.0    WI 15.7.95
+!      2.0    WI 12.11.97  ENHANCED WITH POLDER AND VAN SANTEN EQUATIONS (SEE
+!                           POLDER.M)
+!      3.0    MD  1 APR 05 TRANSLATED TO FORTRAN FROM MATLAB
+!      3.1    MD 21 NOV 05 CHANGED ALL LOCALS TO DYNAMICALLY ALLOCATABLE
+!
+!   USES:
+!       EPSICE, EPSR, POLDER
+!
+!   COPYRIGHT (C) 1997 BY THE INSTITUTE OF APPLIED PHYSICS,
+!   UNIVERSITY OF BERN, SWITZERLAND
+
+IMPLICIT NONE
+
+INTEGER,INTENT(IN):: NUM
+REAL, INTENT(IN) :: ROI(NUM),TI(NUM),FREQ
+REAL, INTENT(OUT) :: EPSI(NUM), EPSII(NUM)
+INTEGER :: I
+REAL :: EI
+REAL,DIMENSION(:),ALLOCATABLE ::  EICE,F,A,EPSP,A3,EA,EA3,K1,K3,KSQ
+
+
+ALLOCATE( EICE(NUM),F(NUM),A(NUM),EPSP(NUM),A3(NUM),EA(NUM),EA3(NUM), &
+K1(NUM),K3(NUM),KSQ(NUM) )
+
+CALL EPSICE(TI,FREQ,EICE,NUM)
+
+CALL EPSR_SNOW(ROI,NUM,EPSI)
+
+!     IMAGINARY PART AFTER POLDER AND VAN SANTEN 1946 (EFFECTIVE-MEDIUM APPROX)
+
+F=ROI/0.917
+EI=3.185
+
+DO I=1,NUM
+    A(I)=0.3
+    IF (F(I)<0.55) THEN
+        A(I)=0.476-0.64*F(I)
+    END IF
+    IF (F(I)<0.333) THEN
+        A(I)=0.1+0.5*F(I)
+    END IF
+END DO
+
+!CALL POLDER(F,A,EI,EPSI,EPSP,NUM) !No Longer call Polder!!
+EPSP=EPSI  !Revised according to MEMLS3 code, here the empirical permititivity 
+           !is used directly, no polder!
+
+
+A3=1-2*A
+EA=(EPSP*(1-A))+A
+EA3=(EPSP*(1-A3))+A3
+K1=(EA/(EA+A*(EI-1)))**2
+K3=(EA3/(EA3+A3*(EI-1)))**2
+KSQ=(2*K1+K3)/3
+
+EPSII=EPSI**0.5*EICE*KSQ*F
+
+DEALLOCATE( EICE,F,A,EPSP,A3,EA,EA3,K1,K3,KSQ )
+
+END SUBROUTINE RO2EPSD
+
+
+
+
+
+
+
+
+
+
+! -------------------------------------------------------------------------
+!
+SUBROUTINE SNOWAO(V,A,NUM)
+!
+! -------------------------------------------------------------------------
+!
+!     CODE ORIGINALLY OBTAINED IN MATLAB FROM MATZLER
+!
+!   COMPUTES THE DEPOLARIZATION FACTOR OF OBLATE SNOW GRAINS
+!   NOTE 10, MÄTZLER 1997
+!
+!   A = SNOWAO(V)
+!       A:    DEPOLARIZATION FACTOR OF OBLATE SNOW GRAINS
+!       V:    VOLUME FRACTION OF ICE
+!
+!   VERSION HISTORY:
+!      1.0    WI 29.5.98
+!      2.0    MD 1 APR 05 TRANSLATED TO FORTRAN FROM MATLAB
+!
+!   USES: NONE
+!
+!   COPYRIGHT (C) 1997 BY THE INSTITUTE OF APPLIED PHYSICS,
+!   UNIVERSITY OF BERN, SWITZERLAND
+
+
+IMPLICIT NONE
+INTEGER, INTENT(IN) :: NUM
+REAL, INTENT(IN) :: V(NUM)
+REAL, INTENT(OUT) :: A(NUM)
+INTEGER I
+
+DO I=1,NUM
+    A(I)=0.3
+    IF (V(I)<0.55) THEN
+        A(I)=0.476-0.64*V(I)
+    END IF
+    IF (V(I)<=0.333) THEN
+        A(I)=0.1+0.5*V(I)
+    END IF
+END DO
+
+END SUBROUTINE SNOWAO
+
+
+
+
+
+
+
+
+
+! -------------------------------------------------------------------------
+!
+SUBROUTINE EPSICE(TI,FREQ,EICE,NUM)
+!
+! -------------------------------------------------------------------------
+!
+!   CODE ORIGINALLY OBTAINED IN MATLAB FROM MATZLER
+!
+!   CALCULATES THE DIELECTRIC PERMITTIVITY OF ICE
+!   AFTER HUFFORD, MITZIMA AND MATZLER
+!
+!   EICE = EPSICE(TI,FREQ)
+!      EICE:  DIELECTRIC PERMITTIVITY OF ICE
+!      TI:    TEMPERATURE IN K
+!      FREQ:  FREQUENCY IN GHZ
+!
+!   VERSION HISTORY:
+!      1.0    WI 15.7.95
+!      2.0    MD 1 APR 05 TRANSLATED TO FORTRAN FROM MATLAB
+!
+!   USES: NONE
+!
+!   COPYRIGHT (C) 1997 BY THE INSTITUTE OF APPLIED PHYSICS,
+!   UNIVERSITY OF BERN, SWITZERLAND
+
+IMPLICIT NONE
+
+INTEGER, INTENT(IN) :: NUM
+REAL, INTENT(IN) :: TI(NUM),FREQ
+REAL, INTENT(OUT) ::  EICE(NUM)
+REAL PP(NUM),B,B1,B2,DB(NUM),BETA(NUM),ALPHA(NUM)
+
+
+
+B1=0.0207
+B2=1.16E-11
+B=335.0
+
+!DB=EXP(-10.02+0.0364*(TI-273)) !Jinmei revised according to Matlab code
+DB=EXP(-9.963 + 0.0372*(TI-273))
+BETA=((B1*EXP(B/TI))/(TI*(EXP(B/TI)-1)**2)) + B2*FREQ**2 +DB
+
+PP=(300/TI)-1
+ALPHA=(0.00504+0.0062*PP)*EXP(-22.1*PP)
+EICE=ALPHA/FREQ+BETA*FREQ
+
+END SUBROUTINE EPSICE
+
+
+
+
+
+! -------------------------------------------------------------------------
+!
+SUBROUTINE EPSR_SNOW(ROI,NUM,EPSI)
+!
+! -------------------------------------------------------------------------
+!
+!     CODE ORIGINALLY OBTAINED IN MATLAB FROM MATZLER
+!
+!   CALCULATES THE DIELECTRIC PERMITTIVITY FOR DRY SNOW FROM
+!   DENSITY .
+!
+!   EPSI = EPSR(ROI)
+!       EPSI:  REAL PART OF DIELECTRIC PERMITTIVITY
+!       ROI:   DENSITY G/CM^3
+!
+!   VERSION HISTORY:
+!      1.0    WI 15.7.95
+!      1.1    WI 23.9.97 ADDED LOOYENGA FOR SNOW DENSER THAN 0.4 G/CM^3
+!      2.0    MD 1 APR 05 TRANSLATED TO FORTRAN FROM MATLAB
+!
+!   USES:
+!       EPSICE
+!
+!
+!
+!   COPYRIGHT (C) 1997 BY THE INSTITUTE OF APPLIED PHYSICS,
+!   UNIVERSITY OF BERN, SWITZERLAND
+
+IMPLICIT NONE
+
+INTEGER, INTENT(IN) :: NUM
+REAL, INTENT(IN) :: ROI(NUM)
+REAL, INTENT(OUT) :: EPSI(NUM)
+INTEGER :: I
+REAL :: EHB, ESB
+REAL,DIMENSION(:),ALLOCATABLE :: VFI
+
+ALLOCATE(VFI(NUM))
+
+VFI=ROI/0.917
+EHB=0.99913
+ESB=1.4759
+
+DO I=1,NUM
+    IF (ROI(I)<=0.4) THEN
+        EPSI(I)=1+1.5995*ROI(I)+1.861*ROI(I)**3
+    ELSE
+        EPSI(I)=((1-VFI(I))*EHB+VFI(I)*ESB)**3
+    END IF
+END DO
+
+DEALLOCATE(VFI)
+
+END SUBROUTINE EPSR_SNOW
+
+
