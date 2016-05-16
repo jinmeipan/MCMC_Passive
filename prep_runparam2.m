@@ -110,49 +110,48 @@ Estimate=[1,1,1,1,1];     %to be revised!
 % Estimate=[-1,-1,-1,-1,-1];     %to be revised!
 % Estimate=[0, 1, 1,1,1];     %to be revised!
 % Estimate=[-1,1,1,1,1];     %to be revised!
-
+Nburn=2000;
 
 fid_rp=fopen([folder0,'temp/RunParamsV2_',file,'.txt'],'w');
 
 fprintf(fid_rp,'Number of pits to run (Npits)\n');
-fprintf(fid_rp,'%3i\n',npits);
+fprintf(fid_rp,'%5d\n',npits);
 fprintf(fid_rp,'Number of variables in pit profile (Npro) (Don?t change)\n');
-fprintf(fid_rp,'5\n');
+fprintf(fid_rp,'%5d\n',5);
 fprintf(fid_rp,'Number of Theta variables (NthetaVars)\n');
-fprintf(fid_rp,'4\n');
+fprintf(fid_rp,'%5d\n',4);
 fprintf(fid_rp,'Number of iterations in the Markov Chain (Niter)\n');
-%fprintf(fid_rp,'10000\n');
-fprintf(fid_rp,'%8i\n',Niter);
+fprintf(fid_rp,'%12d\n',Niter);
 fprintf(fid_rp,'Number of burn-in iterations in the Markov Chain (Nburn)\n');
-fprintf(fid_rp,'2000\n');
+fprintf(fid_rp,'%6d\n',Nburn);
 fprintf(fid_rp,'Number of observation polarizations to use (Np)\n');
-fprintf(fid_rp,'%3i\n',npol);
+fprintf(fid_rp,'%5d\n',npol);
 fprintf(fid_rp,'Number of observation frequencies to use (Nf)\n');
-fprintf(fid_rp,'%3i\n',length(freq));
+fprintf(fid_rp,'%5d\n',length(freq));
 fprintf(fid_rp,'Number of independent observation "times" (Nobs)\n');
-fprintf(fid_rp,'1\n');
+fprintf(fid_rp,'%5d\n',1);
 fprintf(fid_rp,'Number of Ctrl variables given to MEMLS (Nc), 4 (Don?t change)\n');
-fprintf(fid_rp,'4\n');
+fprintf(fid_rp,'%5d\n',4);
 fprintf(fid_rp,'Number of Auxiliary inputs given to MEMLS (Nx), 8 (Don?t change)\n');
-fprintf(fid_rp,'8\n');
+fprintf(fid_rp,'%5d\n',8);
 fprintf(fid_rp,'!Error standard deviation of Tb observations (StdTb)\n');
-fprintf(fid_rp,'%4.1f\n',stdTb);
+fprintf(fid_rp,'%5.1f\n',stdTb);
 fprintf(fid_rp,'Scattering Coefficient Option (ScatOpt): 1 (Empirical, Halli), 2 (Born, HUT combination), or 3 (Roy)\n');
-fprintf(fid_rp,'%3i\n',scatopt);
+fprintf(fid_rp,'%5d\n',scatopt);
 fprintf(fid_rp,'Method to convert from snow grain size to exponential correlation length Option (Opt_DmaxToPex): 1 (Weissflujoch), 2 (Sodankyla), or 3 (AlreadyPex)\n');
-fprintf(fid_rp,'%3i\n',pexopt);
+fprintf(fid_rp,'%5d\n',pexopt);
 fprintf(fid_rp,'Use prior information, 0 or 1. (UsePrior)\n');
-fprintf(fid_rp,'1\n');
+fprintf(fid_rp,'%5d\n',1);
 fprintf(fid_rp,'Estimate dZ, -1, 0, 1  (EstimateDz)\n');
-fprintf(fid_rp,'%3i\n',Estimate(1));
+fprintf(fid_rp,'%5d\n',Estimate(1));
 fprintf(fid_rp,'Estimate rho, -1, 0, 1  (EstimateRho)\n');
-fprintf(fid_rp,'%3i\n',Estimate(2));
+fprintf(fid_rp,'%5d\n',Estimate(2));
 fprintf(fid_rp,'Estimate D, -1, 0, 1  (EstimateD)\n');
-fprintf(fid_rp,'%3i\n',Estimate(3));
+fprintf(fid_rp,'%5d\n',Estimate(3));
 fprintf(fid_rp,'Estimate T, -1, 0, 1  (EstimateT)\n');
-fprintf(fid_rp,'%3i\n',Estimate(4));
+fprintf(fid_rp,'%5d\n',Estimate(4));
 fprintf(fid_rp,'Estimate S, -1, 0, 1  (EstimateS)\n');
-fprintf(fid_rp,'%3i\n',Estimate(5));
+fprintf(fid_rp,'%5d\n',Estimate(5));
 fprintf(fid_rp,'Observation frequencies (Freq), Nf lines\n');
 for i=1:length(freq)
 	fprintf(fid_rp,'%6.2f\n',freq(i));
@@ -167,27 +166,27 @@ fprintf(fid_rp,'Tb boundary condition above snow surface (K), Nf*2 lines, V firs
 %end
 for j=1:npol
     for i=1:length(freq)
-        fprintf(fid_rp,'%8.3f\n',TskyStr(i));
+        fprintf(fid_rp,'%10.2f\n',TskyStr(i));
     end
 end
 fprintf(fid_rp,'Minimum & maximum limits for layer thickness [m]\n');
-fprintf(fid_rp,'0.01\n'); %revised to prevent errors!
-fprintf(fid_rp,'10.0\n');
+fprintf(fid_rp,'%6.2f\n',0.01);
+fprintf(fid_rp,'%6.2f\n',10.0);
 fprintf(fid_rp,'Minimum & maximum limits for density [kg/m3]\n');
-fprintf(fid_rp,'50.0\n');
-fprintf(fid_rp,'917.0\n');
+fprintf(fid_rp,'%6.2f\n',50.0);
+fprintf(fid_rp,'%6.2f\n',917.0);
 fprintf(fid_rp,'Minimum & maximum limits for grain diameter [mm]\n');
-fprintf(fid_rp,'0.02\n'); %revised from 0.1mm, because this is also limit for pex
-fprintf(fid_rp,'5.0\n');
+fprintf(fid_rp,'%6.2f\n',0.02);
+fprintf(fid_rp,'%6.2f\n',5.0);
 fprintf(fid_rp,'Minimum & maximum limits for temperature [K]\n');
-fprintf(fid_rp,'243.15\n');
-fprintf(fid_rp,'273.15\n');
+fprintf(fid_rp,'%8.2f\n',243.15);
+fprintf(fid_rp,'%8.2f\n',273.15);
 fprintf(fid_rp,'Minimum & maximum limits for soil moisture [Frac]\n');
-fprintf(fid_rp,'0\n');
-fprintf(fid_rp,'1\n');
+fprintf(fid_rp,'%6.2f\n',0.0);
+fprintf(fid_rp,'%6.2f\n',1.0);
 fprintf(fid_rp,'Minimum & maximum limits for soil rms-height [m]\n');
-fprintf(fid_rp,'0\n');
-fprintf(fid_rp,'0.1\n');
+fprintf(fid_rp,'%6.2f\n',0.0);
+fprintf(fid_rp,'%6.2f\n',0.1);
 fclose(fid_rp);
 
 clear pexopt i fid_rp j
