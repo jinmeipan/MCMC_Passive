@@ -107,14 +107,14 @@ Print *, 'EstimateS=', EstimateS
 Allocate(Freq(Nf),Angle(Nf))
 Read(1,*)
 Do i=1,Nf
-  Read(1,'(F5.1)') Freq(i)
+  Read(1,'(F6.2)') Freq(i)
 End Do
 Print *, 'Freq=', Freq
 
 ! Observation angles (Angle), Nf lines
 Read(1,*)
 Do i=1,Nf
-  Read(1,'(F5.1)') Angle(i)
+  Read(1,'(F6.2)') Angle(i)
 End Do
 Print *, 'Angle=', Angle
 
@@ -123,31 +123,31 @@ Allocate(Tb_Bc(Np,Nf))
 Read(1,*)
 Do i=1,Np
   Do j=1,Nf
-    Read(1,'(F11.1)') Tb_Bc(i,j)
+    Read(1,'(F10.2)') Tb_Bc(i,j)
   End Do
 End Do
 Print *, 'Tb_Bc=', Tb_Bc
 
 ! Minimum & maximum limits for layer thickness [m]
 Read(1,*)
-Read(1,'(F5.1)') DzMinLim
-Read(1,'(F5.1)') DzMaxLim
+Read(1,'(F6.2)') DzMinLim
+Read(1,'(F6.2)') DzMaxLim
 
 ! Minimum & maximum limits for density [kg/m3]
 Read(1,*)
-Read(1,'(F5.1)') RhoMinLim
-Read(1,'(F5.1)') RhoMaxLim
+Read(1,'(F6.2)') RhoMinLim
+Read(1,'(F6.2)') RhoMaxLim
 
 ! Minimum & maximum limits for grain diameter [mm]
 Read(1,*)
-Read(1,'(F5.1)') DMinLim
-Read(1,'(F5.1)') DMaxLim
+Read(1,'(F6.2)') DMinLim
+Read(1,'(F6.2)') DMaxLim
 
 
 ! Minimum & maximum limits for temperature [K]
 Read(1,*)
-Read(1,'(F6.1)') TMinLim
-Read(1,'(F6.1)') TMaxLim
+Read(1,'(F8.2)') TMinLim
+Read(1,'(F8.2)') TMaxLim
 
 TpMaxLim=274-TMinLim !convert the temperature limit from K to 274-K used in the MCMC
 TpMinLim=274-TMaxLim !convert the temperature limit from K to 274-K used in the MCMC
@@ -155,13 +155,13 @@ TpMinLim=274-TMaxLim !convert the temperature limit from K to 274-K used in the 
 
 ! Minimum & maximum limits for soil moisture [K]
 Read(1,*)
-Read(1,'(F6.1)') MvSMinLim
-Read(1,'(F6.1)') MvSMaxLim
+Read(1,'(F6.2)') MvSMinLim
+Read(1,'(F6.2)') MvSMaxLim
 
 ! Minimum & maximum limits for soil rms-height [m]
 Read(1,*)
-Read(1,'(F6.1)') GndSigMinLim
-Read(1,'(F6.1)') GndSigMaxLim
+Read(1,'(F6.2)') GndSigMinLim
+Read(1,'(F6.2)') GndSigMaxLim
 
 
 Close(ParFileUnit)
