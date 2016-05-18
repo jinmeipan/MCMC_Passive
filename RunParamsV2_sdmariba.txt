@@ -1,0 +1,71 @@
+Number of pits to run (Npits)
+ 10
+Number of variables in pit profile (Npro) (Don?t change)
+5
+Number of Theta variables (NthetaVars)
+4
+Number of iterations in the Markov Chain (Niter)
+   30000
+Number of burn-in iterations in the Markov Chain (Nburn)
+2000
+Number of observation polarizations to use (Np)
+  1
+Number of observation frequencies to use (Nf)
+  4
+Number of independent observation "times" (Nobs)
+1
+Number of Ctrl variables given to MEMLS (Nc), 4 (Don?t change)
+4
+Number of Auxiliary inputs given to MEMLS (Nx), 8 (Don?t change)
+8
+!Error standard deviation of Tb observations (StdTb)
+ 2.0
+Scattering Coefficient Option (ScatOpt): 1 (Empirical, Halli), 2 (Born, HUT combination), or 3 (Roy)
+  2
+Method to convert from snow grain size to exponential correlation length Option (Opt_DmaxToPex): 1 (Weissflujoch), 2 (Sodankyla), or 3 (AlreadyPex)
+  3
+Use prior information, 0 or 1. (UsePrior)
+1
+Estimate dZ, -1, 0, 1  (EstimateDz)
+  1
+Estimate rho, -1, 0, 1  (EstimateRho)
+  1
+Estimate D, -1, 0, 1  (EstimateD)
+  1
+Estimate T, -1, 0, 1  (EstimateT)
+  1
+Estimate S, -1, 0, 1  (EstimateS)
+  1
+Observation frequencies (Freq), Nf lines
+ 10.65
+ 18.70
+ 36.50
+ 89.00
+Observation angles (Angle), Nf lines
+ 50.00
+ 50.00
+ 50.00
+ 50.00
+Tb boundary condition above snow surface (K), Nf*2 lines, V first, H second
+   2.700
+   2.700
+   2.700
+   2.700
+Minimum & maximum limits for layer thickness [m]
+0.01
+10.0
+Minimum & maximum limits for density [kg/m3]
+50.0
+917.0
+Minimum & maximum limits for grain diameter [mm]
+0.02
+5.0
+Minimum & maximum limits for temperature [K]
+243.15
+273.15
+Minimum & maximum limits for soil moisture [Frac]
+0
+1
+Minimum & maximum limits for soil rms-height [m]
+0
+0.1
