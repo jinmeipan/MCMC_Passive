@@ -151,7 +151,7 @@ for npit=1:r.Npits
 % nplan=2;
 nplan=r.nHat(npit);
 
-no_freq=3;
+no_freq=4;
 
 switch no_freq
     case 3
