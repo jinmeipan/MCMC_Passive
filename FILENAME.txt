@@ -1,0 +1,7 @@
+RunParamsV2_sdmariba.txt
+tb_obs_sdmariba.txt
+hyperpar_sdmariba.txt
+true_theta.txt
+acceptance_sdmariba.txt
+post_tb_sdmariba.out
+post_theta_sdmariba.out
